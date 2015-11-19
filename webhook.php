@@ -22,7 +22,7 @@ if (
     empty($_GET['pageid'])
     || empty($_GET['projectid'])
     || empty($_GET['publickey'])
-    || $_GET['publickey'] != Application::one()->tilda['public']
+    || $_GET['publickey'] != $TILDA_PUBLIC_KEY
 ) {
     errorEnd('Wrong parametr for sync query');
     return ;
@@ -61,7 +61,7 @@ if (! file_exists($fname)) {
 $arPage['needsync'] = 1;
 
 /* и сохраняем данные обратно */
-Tilda::savemetaarticle($arPage);
+$tilda->saveMetaPage($arPage);
 
 /* сообщаем, что все хорошо */
 successEnd('Add to synchronization query page ' . $pageid . ' in project ' . $projectid);

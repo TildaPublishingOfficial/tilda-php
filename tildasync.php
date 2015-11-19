@@ -151,17 +151,6 @@ if (sizeof($arExportPages) > 0) {
 
             $badgeurl =  $tildapage['featureimg'] > '' ? $tildapage['featureimg'] : $tildapage['img'];
 
-            /*
-            if(empty($tildapage['socnetimg']) && $badgeurl > '') {
-                echo "Create badge [$badgeurl]\n";
-                Tilda::createSocnetBadge($badgeurl, $tildapage['title'], $pageid);
-                $socpath = Application::one()->PATH_PUBLIC.'upload'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$pageid.DIRECTORY_SEPARATOR.'socnet.png';
-                if (file_exists($socpath)) {
-                    $tildapage['socnetimg'] = '/upload/pages/'.$pageid.'/socnet.png';
-                }
-            }
-            */
-            
             $tildapage = $tilda->saveMetaPage($tildapage);
         } catch (Exception $e) {
             echo "Error [".$countexport."] tilda page dont export ".$pageid." [".$e->getMessage()."]\n";
