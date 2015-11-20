@@ -13,18 +13,33 @@
  * 
  **/
 ///////////////////////////////////////////////////////////////////////////////
+namespace Tilda;
 
-class Tilda
+class LocalProject
 {
 
-    protected $apiUrl = "http://api.tildacdn.info/v1/";
-    protected $publicKey;
-    protected $secretKey;
-    
     /* Корневая директорая Вашего сайта (абсолютный путь) */
     public $baseDir;
     /* директория, куда будут сохраняться данные проекта (указываем путь относительно корневой директории) */
     public $projectDir;
+    
+    /**
+     * Данные по проекту
+     *
+     * @var array
+     */
+    public $arProject = array();
+    
+    /**
+     * Массивы, куда собираются названия файлов в HTML файле страницы
+     */
+    public $arSearchFiles=array();
+    public $arSearchImages=array();
+    /**
+     * Массивы, куда собираются новые названия файлов на которые нужно поменять, те что в HTML
+     */
+    public $arReplaceFiles=array();
+    public $arReplaceImages=array();
     
     public $emailFrom = 'postmaster';
     public $buglovers = 'you@mail.there';
@@ -36,11 +51,8 @@ class Tilda
      *
      * $arOptions - массив дополнительных параметров
      **/
-    public function __construct($publicKey, $secretKey, $arOptions = array())
+    public function __construct($arOptions = array())
     {
-        $this->publicKey = $publicKey;
-        $this->secretKey = $secretKey;
-        
         /* базовая директория, относительно которой все и создается */
         if (! empty($arOptions['baseDir'])) {
             $this->baseDir = $arOptions['baseDir'];
@@ -96,116 +108,152 @@ class Tilda
         
     }
     
-    /* обращение к API Tilda */
-    public function call($method, $params)
+    public function setProject(&$arProject)
     {
-        /* список методов и обязательный параметров */
-        $arTildaMethods = array(
-            'getprojectslist' => array(),
-            'getproject' => array('required' => array('projectid')),
-            'getprojectexport' => array('required' => array('projectid') ),
-            'getpageslist' => array('required' => array('projectid') ),
-            'getpage' => array('required' => array('pageid') ),
-            'getpagefull' => array('required' => array('pageid') ),
-            'getpageexport' => array('required' => array('pageid') ),
-            'getpagefullexport' => array('required' => array('pageid') ),
-        );
+        $this->arProject = $arProject;
+    }
+    
+    public function copyCssFiles($subdir)
+    {
+        $this->lastError = '';
         
-        /* проверяем, может в API такого метода нет */
-        if (! isset($arTildaMethods[$method])) {
-            $this->lastError = 'Unknown Method: '. $method;
+        if (empty($this->arProject) || empty($this->arProject['css'])) {
+            $this->lastError = "Not found project or empty css";
             return false;
         }
         
-        /* проверяем, все ли необходимые параметры указали */
-        if (isset($arTildaMethods[$method]['required'])) {
-            foreach($arTildaMethods[$method]['required'] as $param) {
-                if (!isset($params[$param])) {
-                    $this->lastError = 'Param ['.$param.'] required for method ['. $method.']';
-                    return false;
-                }
-            }
+        $upload_path = '/' . $this->getProjectDir();
+        if (DIRECTORY_SEPARATOR != '/') {
+            $upload_path = str_replace(DIRECTORY_SEPARATOR,'/', $upload_path);
         }
-        $params['publickey']=$this->publicKey;
-        $params['secretkey']=$this->secretKey;
         
-        $query = http_build_query($params);
-        
-        /* отправляем запрос в API */
-        $result = file_get_contents($this->apiUrl . $method .'/?' . $query);
-        
-        /* проверяем, полученный результат, декодируем его из JSON и отдаем пользователю */
-        if ($result && substr($result,0,1) == '{') {
-            $result = json_decode($result,true);
+        $letter = substr($subdir,0,1);
+        if ( $letter == '/' || $letter == DIRECTORY_SEPARATOR) {
+            $subdir = substr($subdir,1);
+        }
 
-            if (isset($result['status']) && $result['status'] == 'FOUND') {
-                return $result['result'];
-            } else {
-                $this->lastError = 'Not found data';
+        $letter = substr($subdir,-1);
+        if ($letter == '/' || $letter == DIRECTORY_SEPARATOR) {
+            $subdir = substr($subdir,0,-1);
+        }
+
+        $arResult = array();
+        //css
+        for ($i=0;$i<count($this->arProject['css']);$i++) {
+            $newfile = $this->copyFile($this->arProject['css'][$i]['from'], $subdir . DIRECTORY_SEPARATOR . $this->arProject['css'][$i]['to']);
+            if (! $newfile) {
+                //die("Error for coping:" . $this->lastError);
                 return false;
             }
-            return $result;
-        } else {
-            $this->lastError = 'Unknown Error ['.$result.']';
+            $arResult[] = $newfile;
+            
+            if (substr($this->arProject['css'][$i]['to'],0,4) != 'http') {
+                if ($this->arProject['export_csspath'] > '') {
+                    $this->arSearchFiles[] = '|' . $this->arProject['export_csspath'] . '/' . $this->arProject['css'][$i]['to'] . '|i';
+                } else {
+                    $this->arSearchFiles[] = '|' . $this->arProject['css'][$i]['to'] . '|i';
+                }
+                $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['css'][$i]['to'];
+            }
+        }
+        
+        return $arResult;
+    }
+
+    public function copyJsFiles($subdir)
+    {
+        $this->lastError = '';
+        
+        if (empty($this->arProject) || empty($this->arProject['js'])) {
+            $this->lastError = "Not found project or empty JS";
             return false;
         }
+        
+        $upload_path = '/' . $this->getProjectDir();
+        if (DIRECTORY_SEPARATOR != '/') {
+            $upload_path = str_replace(DIRECTORY_SEPARATOR,'/', $upload_path);
+        }
+        
+        $letter = substr($subdir,0,1);
+        if ( $letter == '/' || $letter == DIRECTORY_SEPARATOR) {
+            $subdir = substr($subdir,1);
+        }
+
+        $letter = substr($subdir,-1);
+        if ($letter == '/' || $letter == DIRECTORY_SEPARATOR) {
+            $subdir = substr($subdir,0,-1);
+        }
+
+        $arResult = array();
+        //js
+        for ($i=0;$i<count($this->arProject['js']);$i++) {
+            $newfile = $this->copyFile($this->arProject['js'][$i]['from'], $subdir . DIRECTORY_SEPARATOR . $this->arProject['js'][$i]['to']);
+            if (! $newfile) {
+                //die("Error for coping:" . $this->lastError);
+                return false;
+            }
+            $arResult[] = $newfile;
+            if (substr($this->arProject['js'][$i]['to'],0,4) != 'http') {
+                if ($this->arProject['export_jspath'] > '') {
+                    $this->arSearchFiles[] = '|' . $this->arProject['export_jspath'] . '/' . $this->arProject['js'][$i]['to'] . '|i';
+                } else {
+                    $this->arSearchFiles[] = '|' . $this->arProject['js'][$i]['to'] . '|i';
+                }
+                $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['js'][$i]['to'];
+            }
+        }
+        
+        return $arResult;
     }
 
-    /* функция возвращает спиок проектов пользователя */
-    public function getProjectsList()
+    public function copyImagesFiles($subdir)
     {
-        return $this->call('getprojectslist', array());
+        $this->lastError = '';
+        
+        if (empty($this->arProject) || empty($this->arProject['images'])) {
+            $this->lastError = "Not found project or empty Images";
+            return false;
+        }
+        
+        $upload_path = '/' . $this->getProjectDir();
+        if (DIRECTORY_SEPARATOR != '/') {
+            $upload_path = str_replace(DIRECTORY_SEPARATOR,'/', $upload_path);
+        }
+        
+        $letter = substr($subdir,0,1);
+        if ( $letter == '/' || $letter == DIRECTORY_SEPARATOR) {
+            $subdir = substr($subdir,1);
+        }
+
+        $letter = substr($subdir,-1);
+        if ($letter == '/' || $letter == DIRECTORY_SEPARATOR) {
+            $subdir = substr($subdir,0,-1);
+        }
+
+        $arResult = array();
+        //js
+        for ($i=0;$i<count($this->arProject['images']);$i++) {
+            $newfile = $this->copyFile($this->arProject['images'][$i]['from'], $subdir . DIRECTORY_SEPARATOR . $this->arProject['images'][$i]['to']);
+            if (! $newfile) {
+                //die("Error for coping:" . $this->lastError);
+                return false;
+            }
+            
+            $arResult[] = $newfile;
+            
+            if (substr($this->arProject['images'][$i]['to'],0,4) != 'http') {
+                if ($this->arProject['export_imgpath'] > '') {
+                    $this->arSearchFiles[] = '|' . $this->arProject['export_imgpath'] . '/' . $this->arProject['images'][$i]['to'] . '|i';
+                } else {
+                    $this->arSearchFiles[] = '|' . $this->arProject['images'][$i]['to'] . '|i';
+                }
+                $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['images'][$i]['to'];
+            }
+        }
+        
+        return $arResult;
     }
 
-    /* функция возвращает информацию о проекте */
-    public function getProject($projectid)
-    {
-        return $this->call('getproject', array('projectid' => $projectid));
-    }
-    
-    /* функция возвращает информацию о проекте для экспорта */
-    public function getProjectExport($projectid)
-    {
-        return $this->call('getprojectexport', array('projectid' => $projectid));
-    }
-    
-    /* функция возвращает список страниц проекта */
-    public function getPagesList($projectid)
-    {
-        return $this->call('getpageslist', array('projectid' => $projectid));
-    }
-
-    /* функция возвращает информацию о странице (+body html-code) */
-    public function getPage($pageid)
-    {
-        return $this->call('getpage', array('pageid' => $pageid));
-    }
-
-    /* функция возвращает информацию о странице (+full html-code) */
-    public function getPageFull($pageid)
-    {
-        return $this->call('getpagefull', array('pageid' => $pageid));
-    }
-
-    /* функция возвращает Информация о странице для экспорта (+body html-code) */
-    public function getPageExport($pageid)
-    {
-        return $this->call('getpageexport', array('pageid' => $pageid));
-    }
-
-    /* Информация о странице для экспорта (+full html-code) */
-    public function getPageFullExport($pageid)
-    {
-        return $this->call('getpagefullexport', array('pageid' => $pageid));
-    }
-
-
-    /***
-     * функции прикладного значения
-     */
-    
-    
-    
     /**
      * создаем базовые папки, для хранения css, js, img
      * @return boolean в случае ошибки возвращается FALSE и текст ошибки помещается в Tilda::$lastError
@@ -304,16 +352,17 @@ class Tilda
         $fullprojectdir = $this->baseDir.$this->projectDir; 
         $newfile=$fullprojectdir.$to;
         
-        echo "Copy [$from] to [$newfile]\n";
         if (copy($from, $newfile)) {
             if(substr(sprintf('%o', fileperms($newfile)), -4) !== "0776"){
                 if(!chmod($newfile, 0776)){
-                    echo('. But can\'t set permission for file to 0776 because '.sprintf('%o', fileperms($newfile))."\n");
-                    die();
+                    $this->lastError = '. But can\'t set permission for file to 0776 because '.sprintf('%o', fileperms($newfile));
+                    return false;
                 }
             }
-        }else{
-            echo "<li>(a) Copy failed: ".$newfile."\n";
+            return $newfile;
+        } else {
+            $this->lastError = "(a) Copy failed: ".$newfile;
+            return false;
         }
     }
     
@@ -332,7 +381,6 @@ class Tilda
         $newfile = md5($from);
 
         if (! file_exists($fullprojectdir)) {
-            echo "Create directory ".$fullprojectdir ."\n";
             if (! mkdir($fullprojectdir, '0776', true)) {
                 die("Cannot create directory [" . $fullprojectdir . "]\n");
             }
@@ -352,7 +400,6 @@ class Tilda
         } else {
             /* закачиваем файл */
             copy($from, $fullprojectdir . $newfile);
-            echo "GetImageSize [$from] tmpfile: $newfile\n";
             $size = getimagesize($fullprojectdir . $newfile);
 
             /* определяем тип изображения */
@@ -466,7 +513,6 @@ class Tilda
                 }
 
             }
-
             $html = preg_replace($exportimages, $replaceimages, $tildapage['html']);
         } else {
             $html = $tildapage['html'];
@@ -526,7 +572,6 @@ class Tilda
             $tildapage['fb_img'] = $tmp;
             
         }    
-        
         /* заменяем пути до картинок в HTML на новые (куда картинки скачались) */
         $tildapage = $this->replaceOuterImageToLocal($tildapage, $tildapage['export_imgpath'], '');
         
@@ -594,5 +639,4 @@ EOT;
 
 
 }
-
 

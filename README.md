@@ -23,7 +23,7 @@ define('TILDA_PROJECT_ID', '???');
 Подключите библиотеку внутри Вашего проекта на PHP и используйте пространство имен Tilda (namespace \Tilda)
 
 ```php
-include "tilda-php" . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "Api.php";
+include "tilda-php/classes/Tilda/Api.php";
 use \Tilda;
 ```
 
@@ -38,9 +38,9 @@ $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
 
 Все примеры находятся в каталоге `examples`
 
-* 1-simple-request - показывает как подключать класс Tilda\Api и получить например список проектов.
-* 2-project-sync - синхронизирует проект (скачивает страницы, картинки и скрипты с tilda.cc)
-* 3-mini-site - набор скриптов для показа страниц, сохранения уведомлений об обновлении страниц (webhook) на tilda.cc и синхронизация
+* `1-simple-request` - показывает как подключать класс Tilda\Api и получить например список проектов.
+* `2-project-sync` - синхронизирует проект (скачивает страницы, картинки и скрипты с tilda.cc)
+* `3-mini-site` - набор скриптов для показа страниц, сохранения уведомлений об обновлении страниц (webhook) на tilda.cc и синхронизация
 
 ## Запросы к API
 
