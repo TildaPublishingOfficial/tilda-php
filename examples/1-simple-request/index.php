@@ -14,8 +14,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "Api.php";
 
-define('TILDA_PUBLIC_KEY', 'gbl764s077xne9v81ic2');
-define('TILDA_SECRET_KEY', 'ob8akjcdowy47jceo4fv');
+define('TILDA_PUBLIC_KEY', '???');
+define('TILDA_SECRET_KEY', '???');
 
 use \Tilda;
 

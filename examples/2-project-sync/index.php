@@ -1,7 +1,16 @@
 <?php
-/***
- * Скрипт скачивает страницы с Tilda.cc у указанного проекта
- */
+///////////////////////////////////////////////////////////////////////////////
+/**
+ * Tilda Publishing
+ * @copyright (C) 2015 Оbukhov Nikita Valentinovich. Russia
+ * @license MIT
+ *
+ * @author Michael Akimov <michael@island-future.ru>
+ * 
+ * Описание: 
+ *  Скрипт скачивает страницы с опубликованного, через Tilda.cc, сайта
+ **/
+///////////////////////////////////////////////////////////////////////////////
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "Api.php";
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "LocalProject.php";
 
