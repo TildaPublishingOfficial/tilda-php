@@ -85,12 +85,120 @@ Array (
     'customdomain' => '',
     'css' => Array (
         ...
-    )
-
+    ),
     'js' => Array (
+        ...
+    ),
+    'images' => Array (
         ...
     )
 
+)
+```
+
+-----
+
+Получить данные для экспорта проекта:
+
+```php
+$arProject = $api->getProjectExport(TILDA_PROJECT_ID);
+```
+
+Возвращает массив с описанием запрошенного проекта
+
+```php
+Array (
+    'id' => '',
+    'title' => '',
+    'descr' => '',
+    'customdomain' => '',
+    'export_csspath' => '',
+    'export_jspath' => '',
+    'export_imgpath' => '',
+    'indexpageid' => '',
+    'css' => Array (
+        Array(
+            'from' => '',
+            'to' => ''
+        ),
+        ...
+    ),
+    'js' => Array (
+        Array(
+            'from' => '',
+            'to' => ''
+        ),
+        ...
+    ),
+    'images' => Array (
+        Array(
+            'from' => '',
+            'to' => ''
+        ),
+        ...
+    ),
+    'htaccess' => '',
+)
+```
+
+-----
+
+Получить список страниц проекта:
+
+```php
+$arPages = $api->getPagesList(TILDA_PROJECT_ID);
+```
+
+Возвращает список массивов с описанием страниц проекта
+
+```php
+Array (
+    Array(
+        'id' => '1001',
+        'projectid' => '0',
+        'title' => 'Page title first',
+        'descr' => '',
+        'img' => '',
+        'featureimg' => '',
+        'alias' => '',
+        'date' => '2014-05-16 14:45:53',
+        'sort' => '80',
+        'published' => '1419702868',
+        'filename' => 'page1001.html'    
+    ),
+    ...
+)
+```
+
+-----
+
+Получить всю информацию о странице для экспорта:
+
+```php
+$arPage = $api->getPageFullExport($pageid);
+```
+
+Возвращает массив с описанием страницы
+
+```php
+Array (
+    'id' => '1001',
+    'projectid' => '0',
+    'title' => 'Page title',
+    'descr' => '',
+    'img' => '',
+    'featureimg' => '',
+    'alias' => '',
+    'date' => '2014-05-16 14:45:53',
+    'sort' => '80',
+    'published' => '1419702868',
+    'images' => Array(
+        Array('from' => '','to' => ''),
+        Array('from' => '','to' => ''),
+        ...
+    ),
+    'html' => 'full page html-code with local links to files',
+    'filename' => 'page1001.html'
 )
 ```
 

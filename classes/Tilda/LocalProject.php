@@ -469,6 +469,7 @@ class LocalProject
             $this->lastError = 'Html file not found';
             return false;
         }
+        return true;
     }
 
     /* заменяем все картинки в HTML-страницы, на локальные адреса */

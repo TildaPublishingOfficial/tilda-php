@@ -1,4 +1,17 @@
 <?php
+///////////////////////////////////////////////////////////////////////////////
+/**
+ * Tilda Publishing
+ * @copyright (C) 2015 Оbukhov Nikita Valentinovich. Russia
+ * @license MIT
+ *
+ * @author Michael Akimov <michael@island-future.ru>
+ * 
+ * Описание: 
+ *  скрипт инициализирует класс API и делает один запрос к Tilda.cc 
+ * 
+ **/
+///////////////////////////////////////////////////////////////////////////////
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "Api.php";
 
 define('TILDA_PUBLIC_KEY', 'gbl764s077xne9v81ic2');

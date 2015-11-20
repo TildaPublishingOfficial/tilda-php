@@ -15,7 +15,15 @@
  **/
 ///////////////////////////////////////////////////////////////////////////////
 
-include $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'config.php';
+include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "Api.php";
+include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "LocalProject.php";
+
+define('TILDA_PUBLIC_KEY', '???');
+define('TILDA_SECRET_KEY', '???');
+define('TILDA_PROJECT_ID', '???');
+
+use \Tilda;
+
 set_time_limit(0);
 
 if (
@@ -32,15 +40,18 @@ $projectid = intval($_GET['projectid']);
 $pageid = intval($_GET['pageid']);
 
 /* проверяем, наш ли проект обновился */
-if ($projectid != $TILDA_PROJECT_ID) {
+if ($projectid != TILDA_PROJECT_ID) {
     errorEnd('Aliens Project ID');
     return ;    
 }
 
-$tilda = new Tilda($TILDA_PUBLIC_KEY, $TILDA_SECRET_KEY, array('baseDir'=>$TILDA_BASE_DIR, 'projectid' => $TILDA_PROJECT_ID));
+$local = new Tilda\LocalProject(array(
+        'projectDir' => 'tilda',
+    )
+);
 
-/* название фалй, в котором хранятся данные по странице */
-$fname = $tilda->getProjectFullDir() . 'meta' . DIRECTORY_SEPARATOR . 'page' . $pageid . '.php';
+/* название файла, в котором хранятся данные по странице */
+$fname = $local->getProjectFullDir() . 'meta' . DIRECTORY_SEPARATOR . 'page' . $pageid . '.php';
 
 /* если такого файла не существует, значит это новая страница */
 if (! file_exists($fname)) {
@@ -61,7 +72,7 @@ if (! file_exists($fname)) {
 $arPage['needsync'] = 1;
 
 /* и сохраняем данные обратно */
-$tilda->saveMetaPage($arPage);
+$local->saveMetaPage($arPage);
 
 /* сообщаем, что все хорошо */
 successEnd('Add to synchronization query page ' . $pageid . ' in project ' . $projectid);
