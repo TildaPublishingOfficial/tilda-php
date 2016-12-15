@@ -377,7 +377,11 @@ class LocalProject
      */
     public function copyImageTo($from, $dir, $isRewrite=false)
     {
-        $fullprojectdir = $this->getProjectFullDir() . $dir;
+        if (substr($dir,0,1) == DIRECTORY_SEPARATOR) {
+            $fullprojectdir = $dir;
+        } else {
+            $fullprojectdir = $this->getProjectFullDir() . $dir;
+        }
         $newfile = md5($from);
 
         if (! file_exists($fullprojectdir)) {
@@ -544,7 +548,7 @@ class LocalProject
         }
 
         if ($tildapage['img'] > '' && substr($tildapage['img'],0,4) == 'http') {
-            $tmp = $this->copyImageTo($tildapage['img'], $upload_path . 'img' . DIRECTORY_SEPARATOR, true);
+            $tmp = $this->copyImageTo($tildapage['img'],  'img' . DIRECTORY_SEPARATOR, true);
             $tildapage['images'][] = array(
                 'from' => $tildapage['img'],
                 'to' => $tildapage['img'],
@@ -554,7 +558,7 @@ class LocalProject
         }    
 
         if ($tildapage['featureimg'] > '' && substr($tildapage['featureimg'],0,4) == 'http') {
-            $tmp = $this->copyImageTo($tildapage['featureimg'], $upload_path . 'img' . DIRECTORY_SEPARATOR, true);
+            $tmp = $this->copyImageTo($tildapage['featureimg'],  'img' . DIRECTORY_SEPARATOR, true);
             $tildapage['images'][] = array(
                 'from' => $tildapage['featureimg'],
                 'to' => $tildapage['featureimg'],
@@ -564,7 +568,7 @@ class LocalProject
         }    
 
         if ($tildapage['fb_img'] > '' && substr($tildapage['fb_img'],0,4) == 'http') {
-            $tmp = $this->copyImageTo($tildapage['fb_img'], $upload_path . 'img' . DIRECTORY_SEPARATOR, true);
+            $tmp = $this->copyImageTo($tildapage['fb_img'],  'img' . DIRECTORY_SEPARATOR, true);
             $tildapage['images'][] = array(
                 'from' => $tildapage['fb_img'],
                 'to' => $tildapage['fb_img'],
