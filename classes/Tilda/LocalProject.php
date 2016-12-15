@@ -404,21 +404,42 @@ class LocalProject
         } else {
             /* закачиваем файл */
             copy($from, $fullprojectdir . $newfile);
-            $size = getimagesize($fullprojectdir . $newfile);
+
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime = $finfo->file($fullprojectdir . $newfile);
+            if (strpos($mime,'html')!== false || strpos($mime,'text')!== false || strpos($mime,'xml')!== false ) {
+                $pos = strpos($file,'<svg');
+                if ($pos!==false) {
+                    $mime = 'image/svg+xml';
+                } else {
+                    $pos = strpos($file,'<SVG');
+                    if ($pos!==false) {
+                        $mime = 'image/svg+xml';
+                    }
+                }
+            }
+            
+            //if (in_array($mime, array('image/gif','image/png','image/jpg','image/jpeg'))) {
+            //    $size = getimagesize($fullprojectdir . $newfile);
+            //} else {
+            //    $size[]
+            //}
 
             /* определяем тип изображения */
-            if(empty($size['mime'])) {
+            if(empty($mime)) {
                 $ext = 'jpg';
             } else {
                 $img = null;
-                if ($size['mime'] == 'image/jpeg') {
+                if ($mime == 'image/jpeg') {
                     $ext = 'jpg';
-                } elseif ($size['mime'] == 'image/png') {
+                } elseif ($mime == 'image/png') {
                     $ext = 'png';
-                } elseif ($size['mime'] == 'image/gif') {
+                } elseif ($mime == 'image/gif') {
                     $ext = 'gif';
-                } if ($size['mime'] == 'image/svg') {
+                } if ($mime == 'image/svg' || $mime == 'image/svg+xml') {
                     $ext = 'svg';
+                } else {
+                    echo "Unkonwn image type $mime for file $from\n";
                 }
             }
             
