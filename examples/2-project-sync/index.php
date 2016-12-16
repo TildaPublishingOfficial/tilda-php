@@ -14,11 +14,15 @@
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "Api.php";
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "LocalProject.php";
 
-define('TILDA_PUBLIC_KEY', '???');
-define('TILDA_SECRET_KEY', '???');
+define('TILDA_PUBLIC_KEY', '- insert public key -');
+define('TILDA_SECRET_KEY', '- insert secret key -');
 define('TILDA_PROJECT_ID', '???');
 
 use \Tilda;
+
+if (empty($_SERVER['DOCUMENT_ROOT'])) {
+    $_SERVER['DOCUMENT_ROOT'] = __DIR__;
+}
 
 $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
 
@@ -38,7 +42,11 @@ unset($arPages);
 /* если все таки есть, что экспортировать */
 if (sizeof($arExportPages) > 0) {
     $local = new Tilda\LocalProject(array(
-            'projectDir' => 'tilda'
+            'projectDir' => 'tilda',
+            /*
+             'buglovers' => 'dev@example.ru', // email for send mail with error or exception
+             'baseDir' => '/var/www/example.ru/'  //  absolute path for sites files
+            */
         )
     );
     /* создаем основные директории проекта (если еще не созданы) */
@@ -93,7 +101,7 @@ if (sizeof($arExportPages) > 0) {
 
             $tildapage['export_imgpath'] = $local->arProject['export_imgpath'];
             $tildapage['needsync'] = '0';
-            
+             
             /* так как мы копировали общие файлы в одни папки, а в HTML они указывают на другие, то произведем замену */
             $html = preg_replace($local->arSearchFiles, $local->arReplaceFiles, $tildapage['html']);
             if ($html > '') {

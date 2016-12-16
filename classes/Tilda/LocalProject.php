@@ -147,7 +147,7 @@ class LocalProject
             }
             $arResult[] = $newfile;
             
-            if (substr($this->arProject['css'][$i]['to'],0,4) != 'http') {
+            if (substr($this->arProject['css'][$i]['to'],0,4) != 'http' && substr($this->arProject['css'][$i]['to'],0,2) != '//') {
                 if ($this->arProject['export_csspath'] > '') {
                     $this->arSearchFiles[] = '|' . $this->arProject['export_csspath'] . '/' . $this->arProject['css'][$i]['to'] . '|i';
                 } else {
@@ -193,7 +193,7 @@ class LocalProject
                 return false;
             }
             $arResult[] = $newfile;
-            if (substr($this->arProject['js'][$i]['to'],0,4) != 'http') {
+            if (substr($this->arProject['js'][$i]['to'],0,4) != 'http' && substr($this->arProject['js'][$i]['to'],0,2) != '//') {
                 if ($this->arProject['export_jspath'] > '') {
                     $this->arSearchFiles[] = '|' . $this->arProject['export_jspath'] . '/' . $this->arProject['js'][$i]['to'] . '|i';
                 } else {
@@ -202,7 +202,6 @@ class LocalProject
                 $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['js'][$i]['to'];
             }
         }
-        
         return $arResult;
     }
 
@@ -241,15 +240,23 @@ class LocalProject
             
             $arResult[] = $newfile;
             
-            if (substr($this->arProject['images'][$i]['to'],0,4) != 'http') {
+            if (substr($this->arProject['images'][$i]['to'],0,4) != 'http' && substr($this->arProject['images'][$i]['to'],0,2) != '//') {
                 if ($this->arProject['export_imgpath'] > '') {
                     $this->arSearchFiles[] = '|' . $this->arProject['export_imgpath'] . '/' . $this->arProject['images'][$i]['to'] . '|i';
                 } else {
+                    if ($this->arProject['images'][$i]['to'] == 'tildafavicon.ico') {
+                        $this->arSearchFiles[] = '|//tilda.ws/img/' . $this->arProject['images'][$i]['to'] . '|i';
+                        $this->arReplaceFiles[] =  $this->arProject['images'][$i]['to'];
+                    }
                     $this->arSearchFiles[] = '|' . $this->arProject['images'][$i]['to'] . '|i';
                 }
                 $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['images'][$i]['to'];
+            } else {
+                $this->arSearchFiles[] =  $this->arProject['images'][$i]['to'];
+                $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['images'][$i]['to'];
             }
         }
+        
         
         return $arResult;
     }
@@ -377,7 +384,9 @@ class LocalProject
      */
     public function copyImageTo($from, $dir, $isRewrite=false)
     {
-        if (substr($dir,0,1) == DIRECTORY_SEPARATOR) {
+        if (substr($dir,0,2) == '//') {
+            $fullprojectdir = $this->getProjectFullDir();
+        } elseif (substr($dir,0,1) == DIRECTORY_SEPARATOR) {
             $fullprojectdir = $dir;
         } else {
             $fullprojectdir = $this->getProjectFullDir() . $dir;
@@ -453,7 +462,7 @@ class LocalProject
                     $ext = 'png';
                 } elseif ($mime == 'image/gif') {
                     $ext = 'gif';
-                } if ($mime == 'image/svg' || $mime == 'image/svg+xml') {
+                } elseif ($mime == 'image/svg' || $mime == 'image/svg+xml') {
                     $ext = 'svg';
                 } else {
                     echo "Unkonwn image type $mime for file $from\n";
@@ -585,7 +594,7 @@ class LocalProject
             $tildapage['images'][$ii]['local'] = $this->copyImageTo($tildapage['images'][$ii]['from'],  'img' . DIRECTORY_SEPARATOR, true);
         }
 
-        if ($tildapage['img'] > '' && substr($tildapage['img'],0,4) == 'http') {
+        if ($tildapage['img'] > '' && (substr($tildapage['img'],0,4) == 'http' || substr($tildapage['img'],0,2) == '//')) {
             $tmp = $this->copyImageTo($tildapage['img'],  'img' . DIRECTORY_SEPARATOR, true);
             $tildapage['images'][] = array(
                 'from' => $tildapage['img'],
@@ -595,7 +604,7 @@ class LocalProject
             $tildapage['img'] = $tmp;
         }    
 
-        if ($tildapage['featureimg'] > '' && substr($tildapage['featureimg'],0,4) == 'http') {
+        if ($tildapage['featureimg'] > '' && (substr($tildapage['featureimg'],0,4) == 'http' || substr($tildapage['featureimg'],0,2) == '//')) {
             $tmp = $this->copyImageTo($tildapage['featureimg'],  'img' . DIRECTORY_SEPARATOR, true);
             $tildapage['images'][] = array(
                 'from' => $tildapage['featureimg'],
@@ -605,7 +614,7 @@ class LocalProject
             $tildapage['featureimg'] = $tmp;
         }    
 
-        if ($tildapage['fb_img'] > '' && substr($tildapage['fb_img'],0,4) == 'http') {
+        if ($tildapage['fb_img'] > '' && (substr($tildapage['fb_img'],0,4) == 'http' || substr($tildapage['fb_img'],0,2) == '//')) {
             $tmp = $this->copyImageTo($tildapage['fb_img'],  'img' . DIRECTORY_SEPARATOR, true);
             $tildapage['images'][] = array(
                 'from' => $tildapage['fb_img'],
