@@ -404,30 +404,47 @@ class LocalProject
         } else {
             /* закачиваем файл */
             copy($from, $fullprojectdir . $newfile);
-
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime = $finfo->file($fullprojectdir . $newfile);
-            if (strpos($mime,'html')!== false || strpos($mime,'text')!== false || strpos($mime,'xml')!== false ) {
-                $pos = strpos($file,'<svg');
-                if ($pos!==false) {
-                    $mime = 'image/svg+xml';
-                } else {
-                    $pos = strpos($file,'<SVG');
+            /*
+            if (class_exists('finfo', false)) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mime = $finfo->file($fullprojectdir . $newfile);
+                if (strpos($mime,'html')!== false || strpos($mime,'text')!== false || strpos($mime,'xml')!== false ) {
+                    $file = file_get_contents($fullprojectdir . $newfile);
+                    $pos = strpos($file,'<svg');
                     if ($pos!==false) {
                         $mime = 'image/svg+xml';
+                    } else {
+                        $pos = strpos($file,'<SVG');
+                        if ($pos!==false) {
+                            $mime = 'image/svg+xml';
+                        }
                     }
                 }
-            }
-            
-            //if (in_array($mime, array('image/gif','image/png','image/jpg','image/jpeg'))) {
-            //    $size = getimagesize($fullprojectdir . $newfile);
-            //} else {
-            //    $size[]
+            } else {
+            */
+                $size = @getimagesize($fullprojectdir . $newfile);
+                $mime = '';
+                if (is_array($size) && !empty($size['mime'])) {
+                    $mime = $size['mime'];
+                }
+                
+                if ($mime == ''){
+                    $file = file_get_contents($fullprojectdir . $newfile);
+                    $pos = strpos($file,'<svg');
+                    if ($pos!==false) {
+                        $mime = 'image/svg+xml';
+                    } else {
+                        $pos = strpos($file,'<SVG');
+                        if ($pos!==false) {
+                            $mime = 'image/svg+xml';
+                        }
+                    }
+                }
             //}
 
             /* определяем тип изображения */
             if(empty($mime)) {
-                $ext = 'jpg';
+                $ext = '';
             } else {
                 $img = null;
                 if ($mime == 'image/jpeg') {
