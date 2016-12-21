@@ -99,6 +99,12 @@ if (sizeof($arExportPages) > 0) {
                 continue;
             }
 
+            /* временный фикс */
+            $html = preg_replace(array('|//static.tildacdn.com/js/|','|//static.tildacdn.com/css/|'),array('',''), $tildapage['html']);
+            if ($html > '') {
+                $tildapage['html'] = $html;
+            }
+
             $tildapage['export_imgpath'] = $local->arProject['export_imgpath'];
             $tildapage['needsync'] = '0';
              
