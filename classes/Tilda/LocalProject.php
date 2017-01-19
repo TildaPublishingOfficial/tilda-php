@@ -154,6 +154,9 @@ class LocalProject
                     $this->arSearchFiles[] = '|' . $this->arProject['css'][$i]['to'] . '|i';
                 }
                 $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['css'][$i]['to'];
+
+                $this->arSearchFiles[] = '|/' . $upload_path.$subdir.'/'.$this->arProject['css'][$i]['to']. '|i';
+                $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['css'][$i]['to'];
             }
         }
         
@@ -199,6 +202,9 @@ class LocalProject
                 } else {
                     $this->arSearchFiles[] = '|' . $this->arProject['js'][$i]['to'] . '|i';
                 }
+                $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['js'][$i]['to'];
+
+                $this->arSearchFiles[] = '|/' . $upload_path.$subdir.'/'.$this->arProject['js'][$i]['to']. '|i';
                 $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['js'][$i]['to'];
             }
         }
