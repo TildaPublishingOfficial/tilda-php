@@ -10,7 +10,7 @@
  * Описание: 
  *  Если этот скрипт указать в Tilda.cc на странице https://tilda.cc/identity/apikeys/ в блоке Webhook,
  *  то при публикации страницы на Tilda.cc, Tilda вызовет этот скрипт и сообщит, какая страница опубликована.
- *  Скрипт эту информацию запишет в каталог meta, чтобы другой скрипт tildasync смог загрузить все обновления
+ *  Скрипт эту информацию запишет в каталог meta, чтобы другой скрипт sync.php смог загрузить все обновления
  * 
  **/
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ if (
     empty($_GET['pageid'])
     || empty($_GET['projectid'])
     || empty($_GET['publickey'])
-    || $_GET['publickey'] != $TILDA_PUBLIC_KEY
+    || $_GET['publickey'] != TILDA_PUBLIC_KEY
 ) {
     errorEnd('Wrong parametr for sync query');
     return ;

@@ -23,6 +23,10 @@ define('TILDA_PROJECT_ID', '???');
 
 use \Tilda;
 
+if (empty($_SERVER['DOCUMENT_ROOT'])) {
+    $_SERVER['DOCUMENT_ROOT'] = __DIR__;
+}
+
 $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
 $local = new Tilda\LocalProject(array(
         'projectDir' => 'tilda',
