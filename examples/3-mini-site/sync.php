@@ -41,8 +41,8 @@ if (sizeof($arExportPages) == 0 && file_exists($local->getProjectFullDir().'meta
     /**/
     while (false !== ($entry = $d->read())) {
         if($entry != '.' && $entry != '..' && !is_dir($dir.$entry)) {
-            $pagestr = substr($entry,7,-4);
-            if (intval($pagestr).'' == $pagestr && $pagestr > 0) {
+            $pagestr = substr($entry,4,-4);
+            if (intval($pagestr).'' == $pagestr && $pagestr > 0 && substr($entry,0,4) == 'page') {
                 $arPage = include $d->path . DIRECTORY_SEPARATOR . $entry;
                 if (!empty($arPage['needsync'])) {
                     $arExportPages[] = intval($pagestr);
@@ -131,6 +131,15 @@ if (sizeof($arExportPages) > 0) {
             $tildapage = $local->saveMetaPage($tildapage);
 
             echo '<br>============ <a href="/' . $local->getProjectDir().'/'.$tildapage['id'].'.html" target="_blank">View page ' . $tildapage['id'] . '</a><br>'."\n";
+            
+            if (!empty($tildapage['alias']) && file_exists($local->getProjectFullDir().'.htaccess')) {
+                $rules = @file_get_contents($local->getProjectFullDir().'.htaccess');
+                if ($rules > '' && strpos($rules, ' '.$tildapage['id'].'.html')===false) {
+                    $rules .= "\nRewriteRule ^".$tildapage['alias']."$ ".$tildapage['id'].".html\n";
+                    echo "Modify htaccess<br>\n";
+                    file_put_contents($local->getProjectFullDir().'.htaccess', $rules);
+                }
+            }
         } catch (Exception $e) {
             echo "Error [".$countexport."] tilda page dont export ".$pageid." [".$e->getMessage()."]\n";
         }

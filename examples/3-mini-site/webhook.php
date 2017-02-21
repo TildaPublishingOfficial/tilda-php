@@ -75,4 +75,4 @@ $arPage['needsync'] = 1;
 $local->saveMetaPage($arPage);
 
 /* сообщаем, что все хорошо */
-successEnd('Add to synchronization query page ' . $pageid . ' in project ' . $projectid);
+$local->successEnd('Add to synchronization query page ' . $pageid . ' in project ' . $projectid);
