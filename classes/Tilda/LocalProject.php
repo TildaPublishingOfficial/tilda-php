@@ -250,10 +250,12 @@ class LocalProject
                 if ($this->arProject['export_imgpath'] > '') {
                     $this->arSearchFiles[] = '|' . $this->arProject['export_imgpath'] . '/' . $this->arProject['images'][$i]['to'] . '|i';
                 } else {
+                    /*
                     if ($this->arProject['images'][$i]['to'] == 'tildafavicon.ico') {
                         $this->arSearchFiles[] = '|//tilda.ws/img/' . $this->arProject['images'][$i]['to'] . '|i';
                         $this->arReplaceFiles[] =  $this->arProject['images'][$i]['to'];
                     }
+                    */
                     $this->arSearchFiles[] = '|' . $this->arProject['images'][$i]['to'] . '|i';
                 }
                 $this->arReplaceFiles[] =  $upload_path.$subdir.'/'.$this->arProject['images'][$i]['to'];
