@@ -6,12 +6,12 @@
  * @license MIT
  *
  * @author Michael Akimov <michael@island-future.ru>
- * 
- * Описание: 
+ *
+ * Описание:
  *  Если этот скрипт указать в Tilda.cc на странице https://tilda.cc/identity/apikeys/ в блоке Webhook,
  *  то при публикации страницы на Tilda.cc, Tilda вызовет этот скрипт и сообщит, какая страница опубликована.
  *  Скрипт эту информацию запишет в каталог meta, чтобы другой скрипт sync.php смог загрузить все обновления
- * 
+ *
  **/
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -26,13 +26,19 @@ use \Tilda;
 
 set_time_limit(0);
 
+$local = new Tilda\LocalProject(array(
+        'projectDir' => 'tilda',
+    )
+);
+
+
 if (
     empty($_GET['pageid'])
     || empty($_GET['projectid'])
     || empty($_GET['publickey'])
     || $_GET['publickey'] != TILDA_PUBLIC_KEY
 ) {
-    errorEnd('Wrong parametr for sync query');
+    $local->errorEnd('Wrong parametr for sync query');
     return ;
 }
 
@@ -41,14 +47,9 @@ $pageid = intval($_GET['pageid']);
 
 /* проверяем, наш ли проект обновился */
 if ($projectid != TILDA_PROJECT_ID) {
-    errorEnd('Aliens Project ID');
-    return ;    
+    $local->errorEnd('Aliens Project ID');
+    return ;
 }
-
-$local = new Tilda\LocalProject(array(
-        'projectDir' => 'tilda',
-    )
-);
 
 /* название файла, в котором хранятся данные по странице */
 $fname = $local->getProjectFullDir() . 'meta' . DIRECTORY_SEPARATOR . 'page' . $pageid . '.php';
