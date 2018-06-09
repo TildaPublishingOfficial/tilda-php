@@ -6,11 +6,11 @@
  * @license MIT
  *
  * @author Michael Akimov <michael@island-future.ru>
- * 
- * Описание: 
+ *
+ * Описание:
  *  Если этот скрипт указать в кроне, то он будет пробегать файлы с описание страниц с tilda.cc и скачивать обновления.
  *  Чтобы скрипт узнавал об обновлениях, нужно указать скрипт webhook.php на сайте tilda.cc в настройках проекта.
- * 
+ *
  **/
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +37,9 @@ $local = new Tilda\LocalProject(array(
 /* Пробегаем список страниц и отбираем те, которые изменились */
 $arExportPages = array();
 if (sizeof($arExportPages) == 0 && file_exists($local->getProjectFullDir().'meta')) {
-    $d = dir($local->getProjectFullDir().'meta');
+    $dir = $local->getProjectFullDir().'meta';
+    $d = dir($dir);
+    
     /**/
     while (false !== ($entry = $d->read())) {
         if($entry != '.' && $entry != '..' && !is_dir($dir.$entry)) {
@@ -63,14 +65,14 @@ if (sizeof($arExportPages) > 0) {
     if ($local->createBaseFolders() === false) {
         die("Error for create folders\n");
     }
-    
+
     /*  берем данные по общим файлам проекта */
     $arProject = $api->getProjectExport(TILDA_PROJECT_ID);
     if (! $arProject) {
         die('Not found project [' . $api->lastError . ']');
     }
     $local->setProject($arProject);
-    
+
     $arSearchFiles = array();
     $arReplaceFiles = array();
 
@@ -82,26 +84,26 @@ if (sizeof($arExportPages) > 0) {
         die('Error in copy CSS files [' . $api->lastError . ']');
     }
     print_r($arFiles);
-    
+
     /* копируем общие JS файлы */
     $arFiles = $local->copyJsFiles('js');
     if (! $arFiles) {
         die('Error in copy JS files [' . $api->lastError . ']');
     }
     print_r($arFiles);
-    
+
     /* копируем общие ШЬП файлы */
     $arFiles = $local->copyImagesFiles('img');
     if (! $arFiles) {
         die('Error in copy IMG files [' . $api->lastError . ']');
     }
     print_r($arFiles);
-    
+
     /* перебеираем теперь страницы и скачиваем каждую по одной */
     foreach ($arExportPages as $pageid) {
         try {
             echo "Export page " . $pageid . "\n";
-            
+
             /* запрашиваем все данные для экспорта страницы */
             $tildapage = $api->getPageFullExport($pageid);
             if (! $tildapage || empty($tildapage['html'])) {
@@ -117,13 +119,13 @@ if (sizeof($arExportPages) > 0) {
 
             $tildapage['export_imgpath'] = $local->arProject['export_imgpath'];
             $tildapage['needsync'] = '0';
-            
+
             /* так как мы копировали общие файлы в одни папки, а в HTML они указывают на другие, то произведем замену */
             $html = preg_replace($local->arSearchFiles, $local->arReplaceFiles, $tildapage['html']);
             if ($html > '') {
                 $tildapage['html'] = $html;
             }
-            
+
             /* сохраним страницу  (при сохранении также происходит копирование картинок использованных на странице) */
             $tildapage = $local->savePage($tildapage);
             echo "Save page $pageid - success\n";
@@ -131,11 +133,12 @@ if (sizeof($arExportPages) > 0) {
             $tildapage = $local->saveMetaPage($tildapage);
 
             echo '<br>============ <a href="/' . $local->getProjectDir().'/'.$tildapage['id'].'.html" target="_blank">View page ' . $tildapage['id'] . '</a><br>'."\n";
-            
+
             if (!empty($tildapage['alias']) && file_exists($local->getProjectFullDir().'.htaccess')) {
                 $rules = @file_get_contents($local->getProjectFullDir().'.htaccess');
                 if ($rules > '' && strpos($rules, ' '.$tildapage['id'].'.html')===false) {
                     $rules .= "\nRewriteRule ^".$tildapage['alias']."$ ".$tildapage['id'].".html\n";
+                    $rules .= "\nRewriteRule ^page".$tildapage['id'].".html$ ".$tildapage['id'].".html\n";
                     echo "Modify htaccess<br>\n";
                     file_put_contents($local->getProjectFullDir().'.htaccess', $rules);
                 }

@@ -6,10 +6,10 @@
  * @license MIT
  *
  * @author Michael Akimov <michael@island-future.ru>
- * 
- * Описание: 
+ *
+ * Описание:
  *  скрипт выводит страницу, запрошенную браузером. Этот файл можно размещать в корне и направлять на него все запросы
- * 
+ *
  **/
 ///////////////////////////////////////////////////////////////////////////////
 include ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "classes" . DIRECTORY_SEPARATOR . "Tilda" . DIRECTORY_SEPARATOR . "LocalProject.php";
