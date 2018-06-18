@@ -39,7 +39,7 @@ $arExportPages = array();
 if (sizeof($arExportPages) == 0 && file_exists($local->getProjectFullDir().'meta')) {
     $dir = $local->getProjectFullDir().'meta';
     $d = dir($dir);
-    
+
     /**/
     while (false !== ($entry = $d->read())) {
         if($entry != '.' && $entry != '..' && !is_dir($dir.$entry)) {
@@ -63,7 +63,7 @@ if (sizeof($arExportPages) > 0) {
     );
     /* создаем основные директории проекта (если еще не созданы) */
     if ($local->createBaseFolders() === false) {
-        die("Error for create folders\n");
+        die("Error for create folders\n".$local->lastError."\n");
     }
 
     /*  берем данные по общим файлам проекта */
