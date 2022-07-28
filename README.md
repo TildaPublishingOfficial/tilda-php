@@ -10,24 +10,23 @@
 
 ## Установка
 
-Копируете архив с исходниками и разархивируете его на веб-сервере, например в папку tilda-php
+Скопируйте архив с исходниками и разархивируйте его на веб-сервере, например в папку tilda-php
 
-Установите константы публичного и секретного ключей
+Установите значения констант публичного/секретного ключей и номера проекта
 
 ```php
-define('TILDA_PUBLIC_KEY', '???');
-define('TILDA_SECRET_KEY', '???');
-define('TILDA_PROJECT_ID', '???');
+const TILDA_PUBLIC_KEY = '???';
+const TILDA_SECRET_KEY = '???';
+const TILDA_PROJECT_ID = '???';
 ```
 
-Подключите библиотеку внутри Вашего проекта на PHP и используйте пространство имен Tilda (namespace \Tilda)
+Подключите библиотеку внутри вашего проекта на PHP
 
 ```php
 include "tilda-php/classes/Tilda/Api.php";
-use \Tilda;
 ```
 
-Все готово и можно приступать к работе:
+Все готово, и можно приступать к работе:
 
 ```php
 $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
@@ -40,7 +39,7 @@ $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
 
 * `1-simple-request` - показывает как подключать класс Tilda\Api и получить например список проектов.
 * `2-project-sync` - синхронизирует проект (скачивает страницы, картинки и скрипты с опубликованного сайта)
-* `3-mini-site` - набор скриптов для показа страниц, сохранения уведомлений об обновлении страниц (webhook) на tilda.cc и синхронизация
+* `3-mini-site` - набор скриптов для показа страниц, сохранения уведомлений об обновлении страниц (webhook) на tilda.cc и синхронизации
 
 ## Запросы к API
 
@@ -48,20 +47,20 @@ $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
 
 -----
 
-Получить все проекты:
+Получить список всех проектов:
 
 ```php
 $arProjects = $api->getProjectsList();
 ```
 
-Возвращает спсиок массивов с описанием проектов
+Возвращает список массивов с описанием проектов
 
 ```php
-array (
-    array (
-        'id'   =>'',
-        'name' =>'',
-        'descr'=>''
+array(
+    array(
+        'id'    => '',
+        'name'  => '',
+        'descr' => ''
     ),
     ...
 )
@@ -69,75 +68,35 @@ array (
 
 -----
 
-Получить данные по проекту:
+Получить информацию о проекте:
 
 ```php
-$arProject = $api->getProject(TILDA_PROJECT_ID);
+$arProject = $api->getProjectInfo(TILDA_PROJECT_ID);
 ```
 
 Возвращает массив с описанием запрошенного проекта
 
 ```php
-Array (
-    'id' => '',
-    'title' => '',
-    'descr' => '',
-    'customdomain' => '',
-    'css' => Array (
-        ...
-    ),
-    'js' => Array (
-        ...
-    ),
-    'images' => Array (
-        ...
-    )
-
-)
-```
-
------
-
-Получить данные для экспорта проекта:
-
-```php
-$arProject = $api->getProjectExport(TILDA_PROJECT_ID);
-```
-
-Возвращает массив с описанием запрошенного проекта
-
-```php
-Array (
-    'id' => '',
-    'title' => '',
-    'descr' => '',
-    'customdomain' => '',
+array(
+    'id'             => '',
+    'title'          => '',
+    'descr'          => '',
+    'customdomain'   => '',
     'export_csspath' => '',
-    'export_jspath' => '',
+    'export_jspath'  => '',
     'export_imgpath' => '',
-    'indexpageid' => '',
-    'css' => Array (
-        Array(
+    'indexpageid'    => '',
+    'customcsstext'  => 'y',
+    'favicon'        => 'https://static.tildacdn.com/img/tildafavicon.ico',
+    'page404id'      => '0',
+    'images'         => array(
+        array(
             'from' => '',
-            'to' => ''
+            'to'   => '',
         ),
         ...
     ),
-    'js' => Array (
-        Array(
-            'from' => '',
-            'to' => ''
-        ),
-        ...
-    ),
-    'images' => Array (
-        Array(
-            'from' => '',
-            'to' => ''
-        ),
-        ...
-    ),
-    'htaccess' => '',
+    'htaccess'       => '',
 )
 ```
 
@@ -152,19 +111,19 @@ $arPages = $api->getPagesList(TILDA_PROJECT_ID);
 Возвращает список массивов с описанием страниц проекта
 
 ```php
-Array (
-    Array(
-        'id' => '1001',
-        'projectid' => '0',
-        'title' => 'Page title first',
-        'descr' => '',
-        'img' => '',
+array (
+    array(
+        'id'         => '1001',
+        'projectid'  => '0',
+        'title'      => 'Page title first',
+        'descr'      => '',
+        'img'        => '',
         'featureimg' => '',
-        'alias' => '',
-        'date' => '2014-05-16 14:45:53',
-        'sort' => '80',
-        'published' => '1419702868',
-        'filename' => 'page1001.html'    
+        'alias'      => '',
+        'date'       => '2014-05-16 14:45:53',
+        'sort'       => '80',
+        'published'  => '1419702868',
+        'filename'   => 'page1001.html',
     ),
     ...
 )
@@ -181,24 +140,41 @@ $arPage = $api->getPageFullExport($pageid);
 Возвращает массив с описанием страницы
 
 ```php
-Array (
-    'id' => '1001',
-    'projectid' => '0',
-    'title' => 'Page title',
-    'descr' => '',
-    'img' => '',
-    'featureimg' => '',
-    'alias' => '',
-    'date' => '2014-05-16 14:45:53',
-    'sort' => '80',
-    'published' => '1419702868',
-    'images' => Array(
-        Array('from' => '','to' => ''),
-        Array('from' => '','to' => ''),
+array(
+    'id'              => '1001',
+    'projectid'       => '0',
+    'title'           => 'Page title',
+    'descr'           => '',
+    'img'             => '',
+    'featureimg'      => '',
+    'alias'           => '',
+    'date'            => '2014-05-16 14=>45=>53',
+    'sort'            => '80',
+    'published'       => '1419702868',
+    'export_jspath'   => '',
+    'export_csspath'  => '',
+    'export_imgpath'  => '',
+    'export_basepath' => '',
+    'project_alias'   => '',
+    'page_alias'      => '',
+    'project_domain'  => 'domain.ru',
+    'images'          => array(
+        array('from' => '', 'to' => ''),
+        array('from' => '', 'to' => ''),
         ...
     ),
-    'html' => 'full page html-code with local links to files',
-    'filename' => 'page1001.html'
+    'js'              => array(
+        array('from' => '', 'to' => ''),
+        array('from' => '', 'to' => ''),
+        ...
+    ),
+    'css'             => array(
+        array('from' => '', 'to' => ''),
+        array('from' => '', 'to' => ''),
+        ...
+    ),
+    'html'            => 'full page html-code with local links to files',
+    'filename'        => 'page1001.html',
 )
 ```
 
