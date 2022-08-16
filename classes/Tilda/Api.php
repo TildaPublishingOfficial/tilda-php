@@ -95,12 +95,20 @@ class Api
     /**
      * Функция возвращает информацию о проекте для экспорта
      *
-     * @param $projectid
+     * @param int    $projectid
+     * @param string $webconfig
      * @return array|false
      */
-    public function getProjectInfo($projectid)
+    public function getProjectInfo($projectid, $webconfig = '')
     {
-        return $this->call('getprojectinfo', array('projectid' => $projectid));
+        if (!in_array($webconfig, array('htaccess', 'nginx'))) {
+            $webconfig = '';
+        }
+        $params = array('projectid' => $projectid);
+        if (!empty($webconfig)) {
+            $params['webconfig'] = $webconfig;
+        }
+        return $this->call('getprojectinfo', $params);
     }
 
     /**
